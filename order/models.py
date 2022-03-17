@@ -3,12 +3,22 @@ from django.db import models
 
 from product.models import Product
 
+from decimal import Decimal
+from django.core.validators import MinValueValidator, MaxValueValidator
+from coupon.models import Coupon
+
+
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='orders', on_delete=models.CASCADE)
     address = models.CharField(max_length=100)
     place = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     paid_amount = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
+    coupon = models.ForeignKey(Coupon,
+                                related_name='orders',
+                                null=True,
+                                blank=True,
+                                on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['-created_at',]
@@ -24,4 +34,3 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return '%s' %self.id
-

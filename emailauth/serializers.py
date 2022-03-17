@@ -56,6 +56,7 @@ class UserLoginSerializer(serializers.Serializer):
     email = serializers.CharField(max_length=255)
     password = serializers.CharField(max_length=128, write_only=True)
     token = serializers.CharField(max_length=255, read_only=True)
+    access = serializers.CharField(max_length=255, read_only=True)
     id = serializers.UUIDField(required=False)
 
     def validate(self, data):
@@ -69,6 +70,8 @@ class UserLoginSerializer(serializers.Serializer):
         try:
             jwt_token = RefreshToken.for_user(user
             )
+            # print(access)
+            # refresh = token['refresh']
             update_last_login(None, user)
         except User.DoesNotExist:
             raise serializers.ValidationError(
@@ -76,7 +79,10 @@ class UserLoginSerializer(serializers.Serializer):
             )
         return {
             'email':user.email,
-            'token': jwt_token.access_token
+            'token': jwt_token,
+            'access': jwt_token.access_token
+            # 'access': second
+            # 'something': access
         }
 
 

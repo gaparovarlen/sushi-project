@@ -56,7 +56,8 @@ class UserLoginView(RetrieveAPIView):
                 'status code' : status.HTTP_200_OK,
                 'message': 'User logged in  successfully',
                 "data": user_serializer.data,
-                'token' : serializer.data['token'],
+                'refresh' : serializer.data['token'],
+                'access' : serializer.data['access'],
                 }, 
                 status=status.HTTP_200_OK)
         else:
@@ -78,7 +79,7 @@ class ForgotPassView(generics.GenericAPIView):
             absurl = 'http://'+ current_site + relativeLink + user_uuid 
             email_body = 'Hi user use link below to verify your email \n' + absurl 
             data = {'email_body': email_body,'to_email': user_email.email, 'email_subject':'Verify Your Email'}
-            Util.send_email(data)
+            # Util.send_email(data)
             return Response(user_data, status=status.HTTP_201_CREATED)
         except User.DoesNotExist:
             return Response("User doesn't exist", status=status.HTTP_400_BAD_REQUEST)

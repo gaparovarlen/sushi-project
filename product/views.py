@@ -1,4 +1,5 @@
 from django.http import Http404
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -7,10 +8,16 @@ from .models import Category, Product
 from .serializers import ProductSerializer, CategorySerializer
 
 class LatestProductsList(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
         products = Product.objects.all()[0:4]
         serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data)
+        if request.user.is_authenticated:
+            username = False
+        else:
+            username = False
+        return Response({"username": username,
+                "data": serializer.data})
 
 class CategoryDetail(APIView):
     def get_object(self, category_slug):
@@ -22,7 +29,12 @@ class CategoryDetail(APIView):
     def get(self, request, category_slug, format=None):
         category = self.get_object(category_slug)
         serializer = CategorySerializer(category)
-        return Response(serializer.data)
+        if request.user.is_authenticated:
+            username = False
+        else:
+            username = False
+        return Response({"username": username,
+                "data": serializer.data})
 
 class ProductDetail(APIView):
     def get_object(self, category_slug, product_slug):
@@ -34,4 +46,9 @@ class ProductDetail(APIView):
     def get(self, request, category_slug, product_slug, format=None):
         product = self.get_object(category_slug, product_slug)
         serializer = ProductSerializer(product)
-        return Response(serializer.data)
+        if request.user.is_authenticated:
+            username = False
+        else:
+            username = False
+        return Response({"username": username,
+                "data": serializer.data})

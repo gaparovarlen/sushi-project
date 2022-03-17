@@ -22,6 +22,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "id",
             "address",
             "place",
+            "coupon",
             "items"
         )
 

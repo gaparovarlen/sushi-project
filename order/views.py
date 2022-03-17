@@ -7,7 +7,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import Order, OrderItem
+from coupon.models import Coupon
 from .serializers import OrderSerializer
+from decimal import Decimal
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
@@ -16,6 +18,12 @@ def checkout(request):
 
     if serializer.is_valid():
         paid_amount = sum(item.get('quantity') * item.get('product').price for item in serializer.validated_data['items'])
+        coupon = serializer.validated_data['coupon']
+        if coupon:
+            coupon = Coupon.objects.get(pk=coupon.id)
+            if coupon:
+                discount = (coupon.discount / Decimal('100')) * paid_amount
+                paid_amount = paid_amount - discount
 
         serializer.save(user=request.user, paid_amount=paid_amount)
 
